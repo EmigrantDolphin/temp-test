@@ -1,6 +1,12 @@
 version: 2
 updates:
   - package-ecosystem: "docker"
-    directory: "/wwww/**"
+    directories:
+      - "/wwww"
+      - "/wwww/openspace"
     schedule:
       interval: "weekly"
+    groups:
+      appdynamics:
+        patterns:
+          - "appdynamics/*"
