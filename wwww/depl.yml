@@ -3,8 +3,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: navigation-service
-  labels:
-    app: navigation-service
 spec:
   replicas: 2
   selector:
@@ -16,21 +14,27 @@ spec:
         app: navigation-service
     spec:
       initContainers:
-        - name: wait-for-db
-          image: busybox:1.35.0
-          command: ["sh", "-c", "sleep 5"]
+        - name: appd-agent
+          image: appdynamics/dotnet-core-agent:26.3.0
+          command: ["cp", "-ra", "/opt/appdynamics/.", "/opt/appdynamics-agent"]
+          volumeMounts:
+            - name: appd-agent-repo
+              mountPath: /opt/appdynamics-agent
       containers:
         - name: app
-          image: nginx:1.25.0
+          image: nginx:1.25.0        # stand-in for your service image
           ports:
             - containerPort: 8080
-          resources:
-            requests:
-              cpu: 100m
-              memory: 128Mi
-            limits:
-              memory: 256Mi
-        - name: sidecar
-          image: redis:7.0.0
-          ports:
-            - containerPort: 6379
+          env:
+            - name: CORECLR_ENABLE_PROFILING
+              value: "1"
+            - name: CORECLR_PROFILER
+              value: "{57e1aa68-2229-41aa-9931-a6e93bbc64d8}"
+            - name: CORECLR_PROFILER_PATH
+              value: /opt/appdynamics-agent/libappdprofiler.so
+          volumeMounts:
+            - name: appd-agent-repo
+              mountPath: /opt/appdynamics-agent
+      volumes:
+        - name: appd-agent-repo
+          emptyDir: {}
