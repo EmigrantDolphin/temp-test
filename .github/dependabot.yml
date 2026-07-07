@@ -1,6 +1,6 @@
 version: 2
 updates:
   - package-ecosystem: "docker"
-    directory: "/k8s"
+    directory: "/wwww"
     schedule:
       interval: "weekly"
