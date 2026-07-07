@@ -15,7 +15,7 @@ spec:
     spec:
       initContainers:
         - name: appd-agent
-          image: appdynamics/dotnet-core-agent:26.3.0
+          image: appdynamics/dotnet-core-agent:26.5.0
           command: ["cp", "-ra", "/opt/appdynamics/.", "/opt/appdynamics-agent"]
           volumeMounts:
             - name: appd-agent-repo
