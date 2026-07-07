@@ -1,1 +1,41 @@
 
+# k8s/deployment.yml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: navigation-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: navigation-service
+  template:
+    metadata:
+      labels:
+        app: navigation-service
+    spec:
+      initContainers:
+        - name: appd-agent
+          image: appdynamics/dotnet-core-agent:26.3.0
+          command: ["cp", "-ra", "/opt/appdynamics/.", "/opt/appdynamics-agent"]
+          volumeMounts:
+            - name: appd-agent-repo
+              mountPath: /opt/appdynamics-agent
+      containers:
+        - name: app
+          image: $docker_repo/$app/$to$image_tag        # stand-in for your service image
+          ports:
+            - containerPort: 8080
+          env:
+            - name: CORECLR_ENABLE_PROFILING
+              value: "1"
+            - name: CORECLR_PROFILER
+              value: "{57e1aa68-2229-41aa-9931-a6e93bbc64d8}"
+            - name: CORECLR_PROFILER_PATH
+              value: /opt/appdynamics-agent/libappdprofiler.so
+          volumeMounts:
+            - name: appd-agent-repo
+              mountPath: /opt/appdynamics-agent
+      volumes:
+        - name: appd-agent-repo
+          emptyDir: {}
