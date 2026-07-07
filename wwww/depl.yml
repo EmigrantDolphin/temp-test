@@ -1,0 +1,36 @@
+# k8s/deployment.yml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: navigation-service
+  labels:
+    app: navigation-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: navigation-service
+  template:
+    metadata:
+      labels:
+        app: navigation-service
+    spec:
+      initContainers:
+        - name: wait-for-db
+          image: busybox:1.35.0
+          command: ["sh", "-c", "sleep 5"]
+      containers:
+        - name: app
+          image: nginx:1.25.0
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              memory: 256Mi
+        - name: sidecar
+          image: redis:7.0.0
+          ports:
+            - containerPort: 6379
