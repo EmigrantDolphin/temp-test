@@ -15,14 +15,14 @@ spec:
     spec:
       initContainers:
         - name: appd-agent
-          image: appdynamics/dotnet-core-agent:26.5.0
+          image: appdynamics/dotnet-core-agent:26.3.0
           command: ["cp", "-ra", "/opt/appdynamics/.", "/opt/appdynamics-agent"]
           volumeMounts:
             - name: appd-agent-repo
               mountPath: /opt/appdynamics-agent
       containers:
         - name: app
-          image: nginx:1.25.0        # stand-in for your service image
+          image: $docker_repo/$app/$to$image_tag        # stand-in for your service image
           ports:
             - containerPort: 8080
           env:
